@@ -228,7 +228,7 @@
    z-index: 50;
  }
  .toast.show { transform: translate(-50%, 0); }
- .call-overlay, .toast { display: none !important; }
+ .toast { display: none !important; }
  .call-overlay {
    position: fixed;
    inset: 0;
@@ -397,6 +397,7 @@
  };
  const app = initializeApp(firebaseConfig);
  const db = getDatabase(app);
+ const NUGRA_VIDEO_URL = 'https://pub-56860c6c90ce4a3d9c2a8baf57cc47b2.r2.dev/WhatsApp%20Video%202026-11-18%20at%204.54.30%20PM.mp4';
  let userId = sessionStorage.getItem('balochi-user-id');
  if (!userId) {
    userId = crypto.randomUUID ? crypto.randomUUID() : `guest-${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -441,63 +442,17 @@
    console.info(message);
  }
  async function startCall(name) {
-   if (!navigator.mediaDevices?.getUserMedia) {
-     showToast('Camera is not supported in this browser');
-     return;
-   }
-
    try {
-     callStream = await navigator.mediaDevices.getUserMedia({
-       video: { facingMode: 'user' },
-       audio: true
-     });
      const callVideo = document.getElementById('call-video');
      document.getElementById('call-name').textContent = name;
-     document.getElementById('call-status').textContent = 'Live now · Connecting';
+     document.getElementById('call-status').textContent = 'Video call';
      document.getElementById('call-overlay').classList.add('active');
      callVideo.pause();
-     callVideo.src = 'WhatsApp Video 2026-11-18 at 4.54.30 PM.mp4';
+     callVideo.src = NUGRA_VIDEO_URL;
      callVideo.load();
      await callVideo.play();
-
-     livePeer = new RTCPeerConnection(rtcConfig);
-     callStream.getTracks().forEach(track => livePeer.addTrack(track, callStream));
-     livePeer.onconnectionstatechange = () => {
-       if (livePeer.connectionState === 'connected') {
-         document.getElementById('call-status').textContent = 'Live camera · Connected';
-       } else if (livePeer.connectionState === 'connecting') {
-         document.getElementById('call-status').textContent = 'Live camera · Connecting';
-       } else if (livePeer.connectionState === 'failed') {
-         document.getElementById('call-status').textContent = 'Live camera · Connection failed';
-       }
-     };
-     livePeer.onicecandidate = event => {
-       if (event.candidate) {
-         push(ref(db, `webrtc/users/${userId}/candidates/user`), event.candidate.toJSON());
-       }
-     };
-
-     const answerRef = ref(db, `webrtc/users/${userId}/answer`);
-     onValue(answerRef, async snapshot => {
-       const answer = snapshot.val();
-       if (answer && livePeer) {
-         if (livePeer.remoteDescription?.sdp === answer.sdp) return;
-         await livePeer.setRemoteDescription(answer);
-         document.getElementById('call-status').textContent = 'Live now · Camera connected';
-       }
-     });
-     onValue(ref(db, `webrtc/users/${userId}/candidates/admin`), snapshot => {
-       snapshot.forEach(child => {
-         if (child.val()) livePeer.addIceCandidate(child.val()).catch(() => {});
-       });
-     });
-
-     const offer = await livePeer.createOffer();
-     await livePeer.setLocalDescription(offer);
-     await set(ref(db, `webrtc/users/${userId}/offer`), offer);
-     await set(ref(db, `webrtc/users/${userId}/profile`), { name, online: true });
    } catch (error) {
-     showToast('Camera or microphone permission denied');
+     console.error('Hosted Nugra video failed:', error);
    }
  }
  window.startCall = startCall;
